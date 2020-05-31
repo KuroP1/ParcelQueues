@@ -1,0 +1,269 @@
+/********************  Consolas 9pt can fit 105 columns in A4 with 1.27cm as margin ************************** *********/
+/********* ********* ********* ********* ********* ********* ********* ********* ********* ********* ********* *********/
+/**
+ *class ParcelQueues - Assignment 
+ * 
+ * I understand the meaning of academic dishonesty, in particular plagiarism, copyright infringement
+ * and collusion. I am aware of the consequences if found to be involved in these misconducts. 
+ * I hereby declare that the work submitted for the “ITP4510 Data Structures & Algorithms” is
+ * authentic record of my own work.
+ * 
+ * @ElvisYeungYiuLun
+ * @2020-4-9
+ */
+/** parcels rearrangement using queue */
+import java.util.*;
+import java.io.*;
+
+public class ParcelQueues {
+    // data members
+    private static ListQueue[] track = new ListQueue[3]; // array of holding tracks
+    private static int numberOfParcels = 0;// how many parcels total
+    private static int numberOfTracks = 3;// 3 tracks to store parcel ( sometimes use less than 3)
+    private static int smallestParcel = 1; // smallest parcel in any holding track
+    private static int nextOutputTrack = smallestParcel; // holding track with car smallestParcel
+
+    /** all the necessary methods should be constructed here **/
+    public static class ListNode {
+        // attributes
+        public Object data; // set to public for implementation convenience
+        public ListNode next;
+
+        // construtor
+        public ListNode(Object data) {
+            this.data = data;
+            this.next = null;
+        }
+
+        // construtor
+        public ListNode(Object data, ListNode next) {
+            this.data = data;
+            this.next = next;
+        }
+
+    }
+
+    public static class LinkedList {
+        private ListNode head;
+        private ListNode tail;
+
+        // construtor
+        public LinkedList() {
+            head = null;
+            tail = null;
+        }
+
+        // Check the list is it empty
+        public boolean isEmpty() {
+            return (head == null);
+        }
+
+        // Add the item as the first node
+        public void addToHead(Object item) {
+            if (isEmpty()) {
+                // create new Node and put in the data
+                head = tail = new ListNode(item);
+            } else {
+                /*
+                 * create new Node and insert in the data and move the back to the other front
+                 * and the front become the other tail
+                 */
+                head = new ListNode(item, head);
+            }
+        }
+
+        // Add the item as the last node
+        public void addToTail(Object item) {
+            if (isEmpty()) {
+                head = tail = new ListNode(item);
+            } else {
+                tail.next = new ListNode(item);
+                tail = tail.next;
+            }
+        }
+
+        // Remove and return the first node
+        public Object removeFromHead() {
+            Object item = head.data;
+            if (head == tail) // there's only one single node
+                head = tail = null;
+            else
+                head = head.next;
+            return item;
+        }
+
+        // Remove and return the last node
+        public Object removeFromTail() {
+            Object item = tail.data;
+            if (head == tail) { // there is only one node
+                head = tail = null;
+                return item;
+            }
+            // search for the second last node
+            ListNode current = head;
+            while (current.next != tail)
+                current = current.next;
+            // set second last node as new tail
+            tail = current;
+            tail.next = null;
+            return item;
+        }
+    }
+
+    public static class ListQueue {
+        // ListQueue variable
+        private LinkedList qll;
+
+        // Constructor
+        public ListQueue() {
+            qll = new LinkedList();
+        }
+
+        // check the linklist empty
+        public boolean isEmpty() {
+            return qll.isEmpty();
+        }
+
+        // add item to queue
+        public void enqueue(Object item) {
+            qll.addToTail(item);
+        }
+
+        // remove item from queue
+        public Object dequeue() {
+            Object item = qll.removeFromHead();
+            return item;
+        }
+
+        // return the queue first item
+        public Object front() {
+            Object item = qll.removeFromHead();
+            qll.addToHead(item);
+            return item;
+        }
+
+        // return the queue last item
+        public Object back() {
+            Object item = qll.removeFromTail();
+            qll.addToTail(item);
+            return item;
+        }
+
+    }
+
+    // Duplicate exception method
+    public static class DuplicationException extends RuntimeException {
+        public DuplicationException() {
+        }
+    }
+
+    /** main method for the application */
+    public static void main(String[] args) throws DuplicationException {
+        Scanner sc = new Scanner(System.in); // Scanner class
+        int input = 0;// get input
+        // define variables and int array to store input parcel numbers
+        // this the array to store the parcel and within 100 numbers
+        int[] parcelArray = new int[100]; 
+        // this loop is making 3 tracks ,since numberOftracks is 3
+        for (int i = 0; i < numberOfTracks; i++) {
+            track[i] = new ListQueue();
+        }
+
+        do // do while loop to ask for number one by one, repeat while input is > 0
+        {
+            try {
+                // ask for parcel number and store in array //done
+                // if the number is duplicate, then throw DuplicatonException //done
+                // if the input is mismatch the format, the system will jump to
+                // InputMismatchException //done
+
+                System.out.print("Enter parcel number < enter <= 0 to exit> : ");// ask parcel number and 0 is end
+                // program button
+                input = sc.nextInt();
+                if (input <= 0) // when input is smaller than 0 the program will end
+                    break;
+                for (int i = 0; i < numberOfParcels; i++) { // check every time
+                    if (input == parcelArray[i]) // when user input same numbers
+                        throw new DuplicationException(); // throw a new expection tell user did worng
+                }
+                if (input > 100) // when input is larger than 100
+                    System.out.println("Please input between 1 to 100!"); // tell the user to input bewteen 1 to 100
+                else {
+                    parcelArray[numberOfParcels] = input; // else put the number to array and the time will add one
+                    numberOfParcels++;// number of Parcel add one
+                }
+                // find a Duplicate and tell user
+            } catch (DuplicationException e) {
+                System.out.println("");
+                System.out.println("[DuplicationException " + input + " caught!]");
+                System.out.println("");
+                // find a InputMismatch and tell user and ask again
+            } catch (InputMismatchException e) {
+                System.out.println("");
+                System.out.println("[InputMatchException catch!]");
+                sc.next();
+                System.out.println("");
+            }
+
+        } while (true);// everything is fine then do below
+        // print out the number of Tracks, Number of Parcels
+        System.out.println("");
+        System.out.println("Number of Parrecels = " + numberOfParcels);
+        // tell user the input order in parcelArray
+        System.out.print("Input order of parcels <from left to right>is ");
+        // print array
+        for (int i = 0; i < numberOfParcels; i++)
+            System.out.print(parcelArray[i] + " ");
+        System.out.println();
+        // Start running by calling the appropriate methods
+        int y = 0;// this varible means count the parcel move to output buffer
+        for (int i = 0; i < numberOfParcels * 2 - y; i++) { // the loop is input and output parcel
+            for (int x = 0; x < numberOfTracks; x++) { // the loop is make the output store in the tracks
+                if (!track[x].isEmpty()) {
+                    // if the parcels in the tracks is the same as the next output number,
+                    // then the program would output that parcel
+                    if (((Integer) track[x].front()) == nextOutputTrack) {
+                        System.out.println("Move parcel " + nextOutputTrack + " from holding buffer track H" + (x + 1)
+                            + " to output buffer");
+                        track[x].dequeue();
+                        nextOutputTrack++;
+                        x = -1; // duo to x++
+                        y++;
+                    }
+                }
+            }
+            if (parcelArray[i] == nextOutputTrack) { // directly output the parcels to the output parcells
+                System.out.println("Move parcel " + nextOutputTrack + " from input buffer to output buffer directly");
+                nextOutputTrack++;
+                y++;
+            } else if (parcelArray[i] > 1 && nextOutputTrack < numberOfParcels) {
+                // if track 0 empty or that parcel number bigger than H1 queue last number then
+                // enqueue to track 0
+                if (track[0].isEmpty() || parcelArray[i] > ((Integer) track[0].back())) {
+                    track[0].enqueue(parcelArray[i]);
+                    System.out.println("Move parcel " + parcelArray[i] + " from input buffer to holding buffer track H1");
+                }
+                // if track 1 empty or that parcel number bigger than H2 queue last number then
+                // enqueue to track 1
+                else if (track[1].isEmpty() || parcelArray[i] > ((Integer) track[1].back())) {
+                    track[1].enqueue(parcelArray[i]);
+                    System.out.println("Move parcel " + parcelArray[i] + " from input buffer to holding buffer track H2");
+                }
+                // if track 2 empty or that parcel number bigger than H3 queue last number then
+                // enqueue to track 2
+                else if (track[2].isEmpty() || parcelArray[i] > ((Integer) track[2].back())) {
+                    track[2].enqueue(parcelArray[i]);
+                    System.out.println("Move parcel " + parcelArray[i] + " from input buffer to holding buffer track H3");
+                }
+                // if track 123 is the biggest and the remaining parcels can not move to track
+                // tell user to rearrange and end the program
+                else if (parcelArray[i] < (Integer) track[0].back() && parcelArray[i] < (Integer) track[1].back()
+                && parcelArray[i] < (Integer) track[2].back()) {
+                    System.out.println("Fail to rearrange the parcels!");
+                    break;
+                }
+            }
+        }
+        System.out.println("Press any key to continue. . . ");
+    }
+}
